@@ -39,6 +39,12 @@
     <ClInclude Include="..\netmodel\socketbuffer.h">
       <Filter>源文件\netmodel</Filter>
     </ClInclude>
+    <ClInclude Include="..\netmodel\readbuffer.h">
+      <Filter>源文件\netmodel</Filter>
+    </ClInclude>
+    <ClInclude Include="..\netmodel\writebuffer.h">
+      <Filter>源文件\netmodel</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -60,6 +66,15 @@
       <Filter>源文件\netmodel</Filter>
     </ClCompile>
     <ClCompile Include="..\netmodel\socketbuffer.cpp">
+      <Filter>源文件\netmodel</Filter>
+    </ClCompile>
+    <ClCompile Include="..\netmodel\selectop.cpp">
+      <Filter>源文件\netmodel</Filter>
+    </ClCompile>
+    <ClCompile Include="..\netmodel\readbuffer.cpp">
+      <Filter>源文件\netmodel</Filter>
+    </ClCompile>
+    <ClCompile Include="..\netmodel\writebuffer.cpp">
       <Filter>源文件\netmodel</Filter>
     </ClCompile>
   </ItemGroup>

@@ -22,5 +22,13 @@
 #define MAX_SECONDS_IN_MSEC_LONG \
 	(((LONG_MAX) - 999) / 1000)
 
+#ifdef _WIN32
+typedef SOCKET sockfd;
+#endif
+
+#ifdef __linux__
+typedef  int  sockfd ;
+#endif
+
 
 #endif

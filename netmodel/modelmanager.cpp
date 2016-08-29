@@ -1,7 +1,7 @@
 ﻿#include "modelmanager.h"
 
 extern int
-make_socket_nonblocking(int fd);
+make_socket_nonblocking(sockfd fd);
 
 #ifdef WIN32
 extern struct ModelOp win32ops;
@@ -12,7 +12,7 @@ extern struct ModelOp epollops;
 ModelManager::ModelManager()
 {
 	#ifdef WIN32
-	//m_pModelOp = &win32ops;
+	m_pModelOp = &win32ops;
 	#endif
 	#ifdef linux
 		m_pModelOp = &epollops;
@@ -23,7 +23,7 @@ ModelManager::ModelManager()
 ModelManager::~ModelManager()
 {
 	m_pModelOp = NULL;
-	for(std::map<int , SocketWrapper *>::iterator  wrapperIter = m_mapSocketWrappers.begin();
+	for(std::map<sockfd , SocketWrapper *>::iterator  wrapperIter = m_mapSocketWrappers.begin();
 		wrapperIter != m_mapSocketWrappers.end(); wrapperIter++)
 	{
 		if(wrapperIter->second)
@@ -46,17 +46,17 @@ ModelManager::~ModelManager()
 	m_mapSocketWrappers.clear();
 }
 
-SocketWrapper * ModelManager::addFdToManager(int fd, bool isListen)
+SocketWrapper * ModelManager::addFdToManager(sockfd fd, bool isListen)
 {
 	SocketWrapper * socketWrapper = new SocketWrapper(fd,this,isListen);
-	m_mapSocketWrappers.insert(std::pair<int, SocketWrapper *>(fd,socketWrapper));
+	m_mapSocketWrappers.insert(std::pair<sockfd, SocketWrapper *>(fd,socketWrapper));
 	return socketWrapper;
 }
 	
 
-void ModelManager::delFdFromManager(int fd)
+void ModelManager::delFdFromManager(sockfd fd)
 {
-	std::map<int , SocketWrapper *>::iterator findIter = m_mapSocketWrappers.find(fd);
+	std::map<sockfd , SocketWrapper *>::iterator findIter = m_mapSocketWrappers.find(fd);
 	if(findIter == m_mapSocketWrappers.end())
 	{
 		std::cout << "del fd failed , fd : " << fd << "not found!!" <<std::endl;
@@ -79,9 +79,9 @@ void ModelManager::delFdFromManager(int fd)
 #endif
 }
 
-void ModelManager::enableRead(int fd)
+void ModelManager::enableRead(sockfd fd)
 {
-	std::map<int , SocketWrapper *>::iterator findIter = m_mapSocketWrappers.find(fd);
+	std::map<sockfd , SocketWrapper *>::iterator findIter = m_mapSocketWrappers.find(fd);
 	if(findIter == m_mapSocketWrappers.end())
 	{
 		std::cout << "  fd :  " << fd << "not found!!" <<std::endl;
@@ -116,13 +116,14 @@ void ModelManager::enableRead(int fd)
 	}
 
 	findIter->second->setRead(true);
-	m_pModelOp->add(this,fd,oldEvent,curEvent,NULL);
+	SocketIndex * socketIndex = findIter->second->getSocketIndex();
+	m_pModelOp->add(this,fd,oldEvent,curEvent,socketIndex);
 }
 
 
-void ModelManager::enableWrite(int fd)
+void ModelManager::enableWrite(sockfd fd)
 {
-	std::map<int , SocketWrapper *>::iterator findIter = m_mapSocketWrappers.find(fd);
+	std::map<sockfd , SocketWrapper *>::iterator findIter = m_mapSocketWrappers.find(fd);
 	if(findIter == m_mapSocketWrappers.end())
 	{
 		std::cout << "  fd :  " << fd << "not found!!" <<std::endl;
@@ -158,12 +159,13 @@ void ModelManager::enableWrite(int fd)
 	}
 
 	findIter->second->setWrite(true); 
-	m_pModelOp->add(this,fd,oldEvent,curEvent,NULL);
+	SocketIndex * socketIndex = findIter->second->getSocketIndex();
+	m_pModelOp->add(this,fd,oldEvent,curEvent,socketIndex);
 }
 
-void ModelManager::disableRead(int fd)
+void ModelManager::disableRead(sockfd fd)
 {
-	std::map<int , SocketWrapper *>::iterator findIter = m_mapSocketWrappers.find(fd);
+	std::map<sockfd , SocketWrapper *>::iterator findIter = m_mapSocketWrappers.find(fd);
 	if(findIter == m_mapSocketWrappers.end())
 	{
 		std::cout << "  fd :  " << fd << "not found!!" <<std::endl;
@@ -199,13 +201,14 @@ void ModelManager::disableRead(int fd)
 	}
 
 	findIter->second->setRead(false);
-	m_pModelOp->del(this,fd,oldEvent,curEvent,NULL);
+	SocketIndex * socketIndex = findIter->second->getSocketIndex();
+	m_pModelOp->del(this,fd,oldEvent,curEvent,socketIndex);
 
 }
 	
-void ModelManager::disableWrite(int fd)
+void ModelManager::disableWrite(sockfd fd)
 {
-	std::map<int , SocketWrapper *>::iterator findIter = m_mapSocketWrappers.find(fd);
+	std::map<sockfd , SocketWrapper *>::iterator findIter = m_mapSocketWrappers.find(fd);
 	if(findIter == m_mapSocketWrappers.end())
 	{
 		std::cout << "  fd :  " << fd << "not found!!" <<std::endl;
@@ -239,7 +242,8 @@ void ModelManager::disableWrite(int fd)
 	}
 
 	findIter->second->setWrite(false);
-	m_pModelOp->del(this,fd,oldEvent,curEvent,NULL);
+	SocketIndex * socketIndex = findIter->second->getSocketIndex();
+	m_pModelOp->del(this,fd,oldEvent,curEvent,socketIndex);
 }
 
 void * ModelManager::getModelData(void)
@@ -247,7 +251,7 @@ void * ModelManager::getModelData(void)
 	return m_pModelData;
 }
 
-void ModelManager::insertActiveList(int fd, short eventtype)
+void ModelManager::insertActiveList(sockfd fd, short eventtype)
 {
 	if(eventtype&EV_READ)
 	{
@@ -270,10 +274,10 @@ void ModelManager::dispatch(int MilliSec)
 
 	res = m_pModelOp->dispatch(this, NULL);
 
-	for (std::list<int>::iterator iter=m_nReadList.begin();
+	for (std::list<sockfd>::iterator iter=m_nReadList.begin();
 		iter!=m_nReadList.end(); iter++ )
 	{
-		std::map<int , SocketWrapper *>::iterator  findIter = m_mapSocketWrappers.find(*iter);
+		std::map<sockfd , SocketWrapper *>::iterator  findIter = m_mapSocketWrappers.find(*iter);
 		if(findIter == m_mapSocketWrappers.end() )
 		{
 			continue;
@@ -288,10 +292,10 @@ void ModelManager::dispatch(int MilliSec)
 
 	}
 
-	for(std::list<int>::iterator iter=m_nWriteList.begin();
+	for(std::list<sockfd>::iterator iter=m_nWriteList.begin();
 		iter!=m_nWriteList.end(); iter++)
 	{
-		std::map<int , SocketWrapper *>::iterator  findIter = m_mapSocketWrappers.find(*iter);
+		std::map<sockfd , SocketWrapper *>::iterator  findIter = m_mapSocketWrappers.find(*iter);
 		if(findIter == m_mapSocketWrappers.end() )
 		{
 			continue;
@@ -311,4 +315,25 @@ void ModelManager::dispatch(int MilliSec)
 	m_nWriteList.clear();	
 }
 
+SocketIndex * ModelManager::getSocketIndex(sockfd fd)
+{
+	std::map<sockfd , SocketWrapper *>::iterator findIter = m_mapSocketWrappers.find(fd);
+	if(findIter == m_mapSocketWrappers.end())
+	{
+		std::cout << "  fd :  " << fd << "not found!!" <<std::endl;
 
+		#ifdef _WIN32
+		closesocket(fd);
+		#endif
+
+		#ifdef __linux__
+			close(fd);
+		#endif
+
+		return NULL;
+	}
+	else
+	{
+		return findIter->second->getSocketIndex();
+	}
+}

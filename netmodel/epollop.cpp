@@ -38,9 +38,9 @@ static void *epoll_init(void *base);
 static int epoll_dispatch(void *base, struct timeval *tv);
 static void epoll_dealloc(void *base);
 
-static int epoll_add(void *base, int fd, short old,
+static int epoll_add(void *base, sockfd fd, short old,
     short events, void *p);
-static int epoll_del(void *base, int fd, short old,
+static int epoll_del(void *base, sockfd fd, short old,
     short events, void *p);
 
 static int
@@ -77,7 +77,7 @@ struct event_change {
 #define MAX_EPOLL_TIMEOUT_MSEC (35*60*1000)
 
 int
-evutil_make_socket_closeonexec(int fd)
+evutil_make_socket_closeonexec(sockfd fd)
 {
 
 	int flags;
@@ -141,7 +141,7 @@ epoll_op_to_string(int op)
 
 
 static int
-epoll_add(void *base, int fd,short old,
+epoll_add(void *base, sockfd fd,short old,
    short events, void *p)
 {
 	int epollevent = 0; 
@@ -188,7 +188,7 @@ epoll_add(void *base, int fd,short old,
 
 
 static int
-epoll_del(void *base, int fd,
+epoll_del(void *base, sockfd fd,
     short old, short events, void *p)
 {
 	int op = 0;

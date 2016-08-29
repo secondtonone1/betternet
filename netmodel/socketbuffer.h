@@ -12,6 +12,8 @@
 #include <errno.h>
 #endif
 
+#include "netmodeldef.h"
+
 #ifdef _WIN32
 #include <WinSock2.h>
 #include <WinSock.h>
@@ -45,15 +47,10 @@ public:
 
 class SocketBuffer
 {
-friend class SocketWrapper;
-private:
-	SocketBuffer(int fd);
+//friend class SocketWrapper;
+protected:
+	SocketBuffer(sockfd fd);
 	~SocketBuffer();
-	
-	int receive(Node * node);
-	int sendto( Node * node);
-	void  setReadFlag(bool open);
-	void  setWriteFlag(bool open);
 	
 
 	Node* mallocNode(int len = (INITIALSIZE+1));
@@ -61,33 +58,21 @@ private:
 	Node* copyNode(Node * node);
 	void insertNodeTail(Node * node);
 	void insertNodeHead(Node * node);
+	Node * SocketBuffer::popFirstNode();
 
-	Node * popFirstNode();
-
-	Node * getSendNode();
-
-	void clearSendNode();
-
-	int pushData(char * buf, int len);
-
-	int popData(char * buf, int len);
-
-private:
-	SocketBuffer();
+protected:
+	//防止子类调用基类无参构造函数
+	//SocketBuffer();
 	SocketBuffer(const SocketBuffer & socketBuffer);
-	SocketBuffer &  operator = (const SocketBuffer & socketBuffer);
-
-	
 	
 
 	void clearDataList();
 
-	int m_nSocket;
-	bool m_bEnableRead;
-	bool m_bEnableWrite;
+	sockfd m_nSocket;
+
 	
 	NodeList m_listData;
-	Node * m_pCurSend;
+	
 };
 
 

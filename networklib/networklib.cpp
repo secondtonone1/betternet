@@ -1,7 +1,6 @@
 // networklib.cpp : 定义控制台应用程序的入口点。
 //
 
-#include "stdafx.h"
 
 #include <map>
 
@@ -12,6 +11,9 @@
 #ifdef __linux__
 #include <sys/socket.h>
 #include <unistd.h>
+#include <netinet/in.h>
+#include <stdio.h>
+#include <arpa/inet.h>
 #endif
 
 #include<iostream>
@@ -19,51 +21,57 @@
 using namespace std;
 
 
-static void tcpReadCB(ModelManager * managerPoint,  SocketWrapper * wrapper, int fd, void * ctx)
+static void tcpReadCB(ModelManager * managerPoint,  SocketWrapper * wrapper, sockfd fd, void * ctx)
 {
-	
 	cout << "read success" <<endl;
+	char msg [] = "i love you 1314!!!";
+	cout <<"msg size is: "<< sizeof(msg) <<endl;
+	wrapper->writeToBuffer(msg, sizeof(msg));
+	
 
 }
 	
-static void tcpWriteCB(ModelManager * managerPoint,  SocketWrapper * wrapper, int fd, void * ctx)
+static void tcpWriteCB(ModelManager * managerPoint,  SocketWrapper * wrapper, sockfd fd, void * ctx)
 {
 	cout << "write success" <<endl;
 }
 	
-static void tcpErrorCB(ModelManager * managerPoint,  SocketWrapper * wrapper, int fd, void * ctx)
+static void tcpErrorCB(ModelManager * managerPoint,  SocketWrapper * wrapper, sockfd fd, void * ctx)
 {
 	cout << "error　！！！" << endl;
 }
 
-void listenerReadCb(ModelManager * managerPoint,  SocketWrapper * wrapper, int fd, void * ctx)
+void listenerReadCb(ModelManager * managerPoint,  SocketWrapper * wrapper, sockfd fd, void * ctx)
 {
+	cout << "begin accept!!!"<<endl;
 	sockaddr_in serveraddr;
 	memset(&serveraddr, 0, sizeof(sockaddr_in));
 	size_t addrlen = sizeof(sockaddr_in);
-	int acceptres = accept(fd, (sockaddr *)&serveraddr, (socklen_t *)&addrlen);
+	sockfd acceptres = accept(fd, (sockaddr *)&serveraddr, (socklen_t *)&addrlen);
 	if(acceptres == -1)
 	{
 		cout << "accept failed !" <<endl;
+		int Error = getErrno();
+		cout << "errorno is : "<< Error <<endl;
 		return ;
 	}
 	
 	SocketWrapper * tcpWrapper = managerPoint->addFdToManager(acceptres);
 	tcpWrapper->registercb(tcpReadCB, tcpWriteCB, tcpErrorCB);
-
+	managerPoint->enableRead(acceptres);
 	cout << "new connection arrived: "<< inet_ntoa(serveraddr.sin_addr) << endl;
  	
 }
 
 
-int _tmain(int argc, _TCHAR* argv[])
+int main(int argc, char* argv[])
 {
 	#ifdef WIN32
 		WSADATA wsa_data;
 		WSAStartup(0x0201, &wsa_data);
 	#endif
 
-	int m_nListenfd =  socket(AF_INET, SOCK_STREAM, 0);
+	sockfd m_nListenfd =  socket(AF_INET, SOCK_STREAM, 0);
 
 	if(m_nListenfd == -1)
 	{
@@ -90,7 +98,7 @@ int _tmain(int argc, _TCHAR* argv[])
 
 	listen(m_nListenfd, 128);
 	ModelManager * manager = new ModelManager();
-	SocketWrapper * listenerWrapper = manager->addFdToManager(m_nListenfd);
+	SocketWrapper * listenerWrapper = manager->addFdToManager(m_nListenfd,true);
 	listenerWrapper->registercb(listenerReadCb, NULL, NULL);
 	manager->enableRead(m_nListenfd);
 

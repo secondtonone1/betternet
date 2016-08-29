@@ -17,7 +17,7 @@ int getErrno()
 }
 
 int
-make_socket_nonblocking(int fd)
+make_socket_nonblocking(sockfd fd)
 {
 #ifdef WIN32
 	{

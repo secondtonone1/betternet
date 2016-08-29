@@ -22,8 +22,8 @@ struct ModelOp
 {
 	const char *name;
 	void *(*init)(void *);
-	int (*add)(void *, int fd, short old, short events, void *fdinfo);
-	int (*del)(void *, int fd, short old, short events, void *fdinfo);
+	int (*add)(void *, sockfd fd, short old, short events, void *fdinfo);
+	int (*del)(void *, sockfd fd, short old, short events, void *fdinfo);
 	int (*dispatch)(void *, struct timeval *);
 	void (*dealloc)(void *);
 };
@@ -34,22 +34,23 @@ public:
 	ModelManager();
 	~ModelManager();
 	//将文件描述符添加到socketwrapper的map中
-	SocketWrapper * addFdToManager(int fd, bool isListen = false);
+	SocketWrapper * addFdToManager(sockfd fd, bool isListen = false);
 	//将文件描述符从map中移除
-	void delFdFromManager(int fd);
-	void enableRead(int fd);
-	void enableWrite(int fd);
-	void disableRead(int fd);
-	void disableWrite(int fd);
+	void delFdFromManager(sockfd fd);
+	void enableRead(sockfd fd);
+	void enableWrite(sockfd fd);
+	void disableRead(sockfd fd);
+	void disableWrite(sockfd fd);
 	void * getModelData(void);
-	void insertActiveList(int fd, short eventtype);
+	void insertActiveList(sockfd fd, short eventtype);
 	void dispatch(int MilliSec);
+	SocketIndex * getSocketIndex(sockfd fd);
 private:
-	std::map<int , SocketWrapper *> m_mapSocketWrappers;
+	std::map<sockfd , SocketWrapper *> m_mapSocketWrappers;
 	ModelOp * m_pModelOp;
 	void * m_pModelData;
-	std::list<int> m_nReadList;
-	std::list<int> m_nWriteList;
+	std::list<sockfd> m_nReadList;
+	std::list<sockfd> m_nWriteList;
 	
 };
 

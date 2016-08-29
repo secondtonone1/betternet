@@ -2,34 +2,43 @@
 #include "modelmanager.h"
 int readtimes = 0;
 extern int
-make_socket_nonblocking(int fd);
-static void defaultReadCB(ModelManager * managerPoint,  SocketWrapper * wrapper, int fd, void * ctx)
+make_socket_nonblocking(sockfd fd);
+static void defaultReadCB(ModelManager * managerPoint,  SocketWrapper * wrapper, sockfd fd, void * ctx)
 {
 
 }
 	
-static void defaultWriteCB(ModelManager * managerPoint,  SocketWrapper * wrapper, int fd, void * ctx)
+static void defaultWriteCB(ModelManager * managerPoint,  SocketWrapper * wrapper, sockfd fd, void * ctx)
 {
 
 }
 	
-static void defaultErrorCB(ModelManager * managerPoint,  SocketWrapper * wrapper, int fd, void * ctx)
+static void defaultErrorCB(ModelManager * managerPoint,  SocketWrapper * wrapper, sockfd fd, void * ctx)
 {
 
 }
 
-SocketWrapper::SocketWrapper(int fd, ModelManager * modelManager, bool isListen):m_bRead(false), m_bWrite(false), m_nSocketFd(fd),m_bufferRead(fd),m_bufferWrite(fd),
+SocketWrapper::SocketWrapper(sockfd fd, ModelManager * modelManager, bool isListen):m_bRead(false), m_bWrite(false), m_nSocketFd(fd),m_bufferRead(fd),m_bufferWrite(fd),
 		m_pModelManager(modelManager),m_bIsListen(isListen)
 	{
 		make_socket_nonblocking(fd);
-		m_bufferRead.setReadFlag(true);
-		m_bufferWrite.setWriteFlag(true);
+		
 		m_pErrorCBFunc = &defaultErrorCB;
 		m_pReadCBFunc = &defaultReadCB;
 		m_pWriteCBFunc = &defaultWriteCB;
+		m_pSocketIndex = (SocketIndex *)malloc(sizeof(struct SocketIndex));
+		m_pSocketIndex->read_pos_plus1 = -1;
+		m_pSocketIndex->write_pos_plus1 = -1;
+	
 	}
 
 SocketWrapper::	~SocketWrapper(){m_bRead = false; m_bWrite = false; 
+
+	if(m_pSocketIndex)
+	{
+		free(m_pSocketIndex);
+		m_pSocketIndex = NULL;
+	}
 }
 
 
@@ -205,3 +214,7 @@ void SocketWrapper::registercb(read_cb  readcallback,  write_cb writecallback, e
 	}
 }
 
+SocketIndex * SocketWrapper::getSocketIndex()
+{
+	return m_pSocketIndex;
+}

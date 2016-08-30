@@ -58,7 +58,7 @@ protected:
 	Node* copyNode(Node * node);
 	void insertNodeTail(Node * node);
 	void insertNodeHead(Node * node);
-	Node * SocketBuffer::popFirstNode();
+	Node * popFirstNode();
 
 protected:
 	//防止子类调用基类无参构造函数

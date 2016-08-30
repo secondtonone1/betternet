@@ -1,4 +1,4 @@
-CXXFLAGS = -I./netmodel  
+CXXFLAGS = -I./netmodel -lpthread  
 TARGET = networklibtest
 DIRS = ./netmodel ./Linux
 OBJDIR = ./Linux

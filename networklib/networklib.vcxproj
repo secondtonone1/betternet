@@ -81,6 +81,8 @@
     <Text Include="ReadMe.txt" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\netmodel\basethread.h" />
+    <ClInclude Include="..\netmodel\clock.h" />
     <ClInclude Include="..\netmodel\modelmanager.h" />
     <ClInclude Include="..\netmodel\netmodeldef.h" />
     <ClInclude Include="..\netmodel\readbuffer.h" />
@@ -91,6 +93,8 @@
     <ClInclude Include="targetver.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\netmodel\basethread.cpp" />
+    <ClCompile Include="..\netmodel\clock.cpp" />
     <ClCompile Include="..\netmodel\epollop.cpp" />
     <ClCompile Include="..\netmodel\modelmanager.cpp" />
     <ClCompile Include="..\netmodel\netmodeldef.cpp" />

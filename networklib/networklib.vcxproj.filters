@@ -45,6 +45,12 @@
     <ClInclude Include="..\netmodel\writebuffer.h">
       <Filter>源文件\netmodel</Filter>
     </ClInclude>
+    <ClInclude Include="..\netmodel\basethread.h">
+      <Filter>源文件\netmodel</Filter>
+    </ClInclude>
+    <ClInclude Include="..\netmodel\clock.h">
+      <Filter>源文件\netmodel</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -75,6 +81,12 @@
       <Filter>源文件\netmodel</Filter>
     </ClCompile>
     <ClCompile Include="..\netmodel\writebuffer.cpp">
+      <Filter>源文件\netmodel</Filter>
+    </ClCompile>
+    <ClCompile Include="..\netmodel\basethread.cpp">
+      <Filter>源文件\netmodel</Filter>
+    </ClCompile>
+    <ClCompile Include="..\netmodel\clock.cpp">
       <Filter>源文件\netmodel</Filter>
     </ClCompile>
   </ItemGroup>

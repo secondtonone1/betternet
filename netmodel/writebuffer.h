@@ -12,7 +12,7 @@ class WriteBuffer: public SocketBuffer
 	 WriteBuffer(sockfd fd);
 	~WriteBuffer();
 	WriteBuffer(const WriteBuffer & writebuffer);
-	WriteBuffer &  WriteBuffer::operator = (const WriteBuffer & socketBuffer);
+	WriteBuffer &  operator = (const WriteBuffer & socketBuffer);
 	Node * m_pCurSend;
 	int sendto( Node * node);
 

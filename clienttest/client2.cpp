@@ -70,11 +70,18 @@ int main(int argc, char * argv[])
 		cout << "send data is : " << msg << endl;	
 		times++;
 		cout << "send times is: "<<times<<endl;
+		
+		char buff[1025] = {0};
+
+		int recvLen = recv(s,buff, 1025, 0);
+		cout << "recv datalen: " << recvLen <<endl;
+		cout << "recv data is: " << buff << endl;
 
 	}
 	
-
+	
 	getchar();	
+	shutdown(s,SHUT_WR);
 	close(s);
 
 	return 0;	

@@ -12,7 +12,7 @@ class ReadBuffer: public SocketBuffer
 	 ReadBuffer(sockfd fd);
 	~ReadBuffer();
 	ReadBuffer(const ReadBuffer & readBuffer);
-	ReadBuffer &  ReadBuffer::operator = (const ReadBuffer & socketBuffer);
+	ReadBuffer &  operator = (const ReadBuffer & socketBuffer);
 	
 	int receive(Node * node);
 	

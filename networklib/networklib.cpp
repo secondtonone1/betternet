@@ -23,12 +23,16 @@ using namespace std;
 
 static void tcpReadCB(ModelManager * managerPoint,  SocketWrapper * wrapper, sockfd fd, void * ctx)
 {
-	cout << "read success" <<endl;
+	/*cout << "read success" <<endl;
 	char msg [] = "i love you 1314!!!";
 	cout <<"msg size is: "<< sizeof(msg) <<endl;
-	wrapper->writeToBuffer(msg, sizeof(msg));
+	wrapper->writeToBuffer(msg, sizeof(msg));*/
 	
-
+	int totallen = wrapper->getTotalRead();
+	char * msg = (char *)malloc(sizeof(char) * totallen);
+	memset(msg, 0, totallen);
+	wrapper->readFromBuffer(msg, totallen);
+	wrapper->writeToBuffer(msg, totallen);
 }
 	
 static void tcpWriteCB(ModelManager * managerPoint,  SocketWrapper * wrapper, sockfd fd, void * ctx)

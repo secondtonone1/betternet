@@ -1,6 +1,6 @@
 #include "readbuffer.h"
 
- ReadBuffer::ReadBuffer(sockfd fd):SocketBuffer(fd)
+ ReadBuffer::ReadBuffer(sockfd fd):SocketBuffer(fd),m_nTotal(0)
  {
  
  }
@@ -10,7 +10,7 @@
 	
 }
 	
- ReadBuffer::ReadBuffer(const ReadBuffer & readBuffer):SocketBuffer(readBuffer)
+ ReadBuffer::ReadBuffer(const ReadBuffer & readBuffer):SocketBuffer(readBuffer),m_nTotal(readBuffer.m_nTotal)
 {
 	
 }
@@ -52,7 +52,7 @@
 	m_listData.m_pTail = preNode;
 	
 	
-
+	m_nTotal = socketBuffer.m_nTotal;
 	return *this;
  }
 	
@@ -93,7 +93,7 @@
 
 		node->mOff += recvlen;
 		node->mLen -= recvlen;
-
+		m_nTotal += recvlen;
 		return recvlen;
 		
 	}
@@ -133,5 +133,6 @@
 
 		}
 
+		m_nTotal -= offset;
 		return offset;
 	}

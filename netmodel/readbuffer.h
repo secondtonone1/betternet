@@ -17,6 +17,8 @@ class ReadBuffer: public SocketBuffer
 	int receive(Node * node);
 	
 	int popData(char * buf, int len);
+
+	int m_nTotal;
 };
 
 

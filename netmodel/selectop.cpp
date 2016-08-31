@@ -64,6 +64,7 @@ static int
 do_fd_set(struct win32op *op, struct SocketIndex *ent, SOCKET s, int read)
 {
 	struct win_fd_set *set = read ? op->readset_in : op->writeset_in;
+	
 	if (read) {
 		if (ent->read_pos_plus1 > 0)
 			return (0);
@@ -71,6 +72,7 @@ do_fd_set(struct win32op *op, struct SocketIndex *ent, SOCKET s, int read)
 		if (ent->write_pos_plus1 > 0)
 			return (0);
 	}
+
 	if (set->fd_count == op->num_fds_in_fd_sets) {
 		if (grow_fd_sets(op, op->num_fds_in_fd_sets*2))
 			return (-1);

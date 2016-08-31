@@ -41,6 +41,8 @@ public:
 	
 	SocketIndex * getSocketIndex();
 
+	int getTotalRead();
+
 private:
 	SocketWrapper():m_bWrite(false), m_bRead(false),m_nSocketFd(0),m_bufferRead(0),m_bufferWrite(0),m_pModelManager(NULL){}
 	

@@ -196,6 +196,11 @@ int SocketWrapper::readFromBuffer(char * msg, int len)
 	return m_bufferRead.popData(msg,len);
 }
 
+int SocketWrapper::getTotalRead()
+{
+	return m_bufferRead.m_nTotal;
+}
+
 void SocketWrapper::registercb(read_cb  readcallback,  write_cb writecallback, error_cb errorcallback)
 {
 	if(readcallback)

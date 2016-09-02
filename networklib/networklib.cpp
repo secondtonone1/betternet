@@ -33,6 +33,7 @@ static void tcpReadCB(ModelManager * managerPoint,  SocketWrapper * wrapper, soc
 	memset(msg, 0, totallen);
 	wrapper->readFromBuffer(msg, totallen);
 	wrapper->writeToBuffer(msg, totallen);
+	free(msg);
 }
 	
 static void tcpWriteCB(ModelManager * managerPoint,  SocketWrapper * wrapper, sockfd fd, void * ctx)

@@ -29,12 +29,13 @@ public:
 
 	bool isSetRead(void);
 	bool isSetWrite(void);
-
+	//读函数
 	int ToRead();
+	//写函数
 	int ToWrite();
-
+	//向socketwrapper的writerbuffer写数据并发送
 	int writeToBuffer(char * msg, int len);
-
+	//从readbuffer中读取数据
 	int readFromBuffer(char * msg, int len);
 
 	void registercb(read_cb  readcallback,  write_cb writecallback, error_cb errorcallback);

@@ -82,8 +82,10 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\netmodel\basethread.h" />
-    <ClInclude Include="..\netmodel\clock.h" />
+    <ClInclude Include="..\netmodel\condition.h" />
+    <ClInclude Include="..\netmodel\lock.h" />
     <ClInclude Include="..\netmodel\modelmanager.h" />
+    <ClInclude Include="..\netmodel\mutex.h" />
     <ClInclude Include="..\netmodel\netmodeldef.h" />
     <ClInclude Include="..\netmodel\readbuffer.h" />
     <ClInclude Include="..\netmodel\socketbuffer.h" />
@@ -94,9 +96,10 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\netmodel\basethread.cpp" />
-    <ClCompile Include="..\netmodel\clock.cpp" />
+    <ClCompile Include="..\netmodel\condition.cpp" />
     <ClCompile Include="..\netmodel\epollop.cpp" />
     <ClCompile Include="..\netmodel\modelmanager.cpp" />
+    <ClCompile Include="..\netmodel\mutex.cpp" />
     <ClCompile Include="..\netmodel\netmodeldef.cpp" />
     <ClCompile Include="..\netmodel\readbuffer.cpp" />
     <ClCompile Include="..\netmodel\selectop.cpp" />

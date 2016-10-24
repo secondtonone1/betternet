@@ -57,6 +57,9 @@ struct ModelOp epollops = {
 	epoll_dealloc
 };
 
+//oldevent 为我们自己定义的事件类型如EV_READ/EV_WRITE等表示过去的事件类型
+//curevent表示现在的事件类型EV_READ/EV_WRITE等
+//epollevent 为EPOLL内核定义的事件类型，如EPOLLMOD/EPOLLDEL/EPOLLADD等
 struct event_change {
 	int fd;
 	short oldevent;

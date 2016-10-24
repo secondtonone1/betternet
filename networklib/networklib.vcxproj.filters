@@ -48,7 +48,13 @@
     <ClInclude Include="..\netmodel\basethread.h">
       <Filter>源文件\netmodel</Filter>
     </ClInclude>
-    <ClInclude Include="..\netmodel\clock.h">
+    <ClInclude Include="..\netmodel\lock.h">
+      <Filter>源文件\netmodel</Filter>
+    </ClInclude>
+    <ClInclude Include="..\netmodel\mutex.h">
+      <Filter>源文件\netmodel</Filter>
+    </ClInclude>
+    <ClInclude Include="..\netmodel\condition.h">
       <Filter>源文件\netmodel</Filter>
     </ClInclude>
   </ItemGroup>
@@ -86,7 +92,10 @@
     <ClCompile Include="..\netmodel\basethread.cpp">
       <Filter>源文件\netmodel</Filter>
     </ClCompile>
-    <ClCompile Include="..\netmodel\clock.cpp">
+    <ClCompile Include="..\netmodel\mutex.cpp">
+      <Filter>源文件\netmodel</Filter>
+    </ClCompile>
+    <ClCompile Include="..\netmodel\condition.cpp">
       <Filter>源文件\netmodel</Filter>
     </ClCompile>
   </ItemGroup>

@@ -1,4 +1,4 @@
-// networklib.cpp : ¶¨Òå¿ØÖÆÌ¨Ó¦ÓÃ³ÌĞòµÄÈë¿Úµã¡£
+ï»¿// networklib.cpp : å®šä¹‰æ§åˆ¶å°åº”ç”¨ç¨‹åºçš„å…¥å£ç‚¹ã€‚
 //
 
 
@@ -43,7 +43,7 @@ static void tcpWriteCB(ModelManager * managerPoint,  SocketWrapper * wrapper, so
 	
 static void tcpErrorCB(ModelManager * managerPoint,  SocketWrapper * wrapper, sockfd fd, void * ctx)
 {
-	cout << "error¡¡£¡£¡£¡" << endl;
+	cout << "errorã€€ï¼ï¼ï¼" << endl;
 }
 
 void listenerReadCb(ModelManager * managerPoint,  SocketWrapper * wrapper, sockfd fd, void * ctx)

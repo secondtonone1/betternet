@@ -1,4 +1,4 @@
-#include "Mutex.h"
+#include "mutex.h"
 
 
 #if defined (_WIN32)
@@ -13,7 +13,7 @@ Mutex::Mutex()
 {
 #ifndef WIN32
     int ret = pthread_mutex_init(&mId, NULL);
-    ASSERT(ret == 0);
+    assert(ret == 0);
 #else
     // Note:  Windows Critical sections are recursive in nature and perhaps
     //        this implementation calls for a non-recursive implementation
@@ -29,7 +29,7 @@ Mutex::~Mutex()
 {
 #ifndef WIN32
     int ret = pthread_mutex_destroy(&mId);
-    ASSERT(ret == 0);
+    assert(ret == 0);
 #else
     DeleteCriticalSection((CRITICAL_SECTION *)mId);
     delete mId;
@@ -41,7 +41,7 @@ Mutex::lock()
 {
 #ifndef WIN32
     int ret = pthread_mutex_lock(&mId);
-    ASSERT(ret == 0);
+    assert(ret == 0);
 #else
     EnterCriticalSection((CRITICAL_SECTION *)mId);
 #endif
@@ -54,7 +54,7 @@ Mutex::unlock()
 {
 #ifndef WIN32
     int ret = pthread_mutex_unlock(&mId);
-    ASSERT(ret == 0);
+    assert(ret == 0);
 #else
     LeaveCriticalSection((CRITICAL_SECTION *)mId);
 #endif
@@ -65,10 +65,10 @@ SpinMutex::SpinMutex()
 #ifndef WIN32
 #if !defined(__APPLE__)
     int ret = pthread_mutex_init(&mId, (const pthread_mutexattr_t*)PTHREAD_PROCESS_PRIVATE);
-    ASSERT(ret == 0);
+    assert(ret == 0);
 #else
     int ret = pthread_mutex_init(&mId, (const pthread_mutexattr_t*)NULL);
-    ASSERT(ret == 0);
+    assert(ret == 0);
 #endif
 #else
     mId = new CRITICAL_SECTION();
@@ -81,7 +81,7 @@ SpinMutex::~SpinMutex()
 {
 #ifndef WIN32
     int ret = pthread_mutex_destroy(&mId);
-    ASSERT(ret == 0);
+    assert(ret == 0);
 #else
     DeleteCriticalSection((CRITICAL_SECTION *)mId);
     delete mId;
@@ -93,7 +93,7 @@ SpinMutex::lock()
 {
 #ifndef WIN32
     int ret = pthread_mutex_lock(&mId);
-    ASSERT(ret == 0);
+    assert(ret == 0);
 #else
     EnterCriticalSection((CRITICAL_SECTION *)mId);
 #endif
@@ -104,7 +104,7 @@ SpinMutex::unlock()
 {
 #ifndef WIN32
     int ret = pthread_mutex_unlock(&mId);
-    ASSERT(ret == 0);
+    assert(ret == 0);
 #else
     LeaveCriticalSection((CRITICAL_SECTION *)mId);
 #endif

@@ -1,8 +1,8 @@
 #ifndef __LYNX_PLATFORM_LIB_MUTEX_H__
 #define __LYNX_PLATFORM_LIB_MUTEX_H__
 
-#include "Lock.h"
-#include "Condition.h"
+#include "lock.h"
+#include "condition.h"
 
 
     class Mutex

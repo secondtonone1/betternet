@@ -6,9 +6,9 @@
 # include <sys/time.h>
 #endif
 
-#include "Mutex.h"
+#include "mutex.h"
 
-#include "Condition.h"
+#include "condition.h"
 
 
 
@@ -159,7 +159,7 @@ Condition::wait(Mutex& mutex, unsigned int ms)
         return true;
     }
 #ifndef WIN32
-    uint64_t expires64 = TimeUtil::getLocalTimeMilliSec() + ms;
+    long long int expires64 = time(0)*1000 + ms;
     timespec expiresTS;
     expiresTS.tv_sec = expires64 / 1000;
     expiresTS.tv_nsec = (expires64 % 1000) * 1000000L;

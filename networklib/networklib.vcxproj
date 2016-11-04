@@ -81,6 +81,7 @@
     <Text Include="ReadMe.txt" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\msghandler\msghandler.h" />
     <ClInclude Include="..\netmodel\basethread.h" />
     <ClInclude Include="..\netmodel\condition.h" />
     <ClInclude Include="..\netmodel\lock.h" />
@@ -95,6 +96,7 @@
     <ClInclude Include="targetver.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\msghandler\msghandler.cpp" />
     <ClCompile Include="..\netmodel\basethread.cpp" />
     <ClCompile Include="..\netmodel\condition.cpp" />
     <ClCompile Include="..\netmodel\epollop.cpp" />

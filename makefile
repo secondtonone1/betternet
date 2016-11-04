@@ -1,6 +1,6 @@
-CXXFLAGS = -I./netmodel -lpthread  
+CXXFLAGS = -I./netmodel -I ./msghandler -lpthread  
 TARGET = networklibtest
-DIRS = ./netmodel ./Linux
+DIRS = ./netmodel ./Linux ./msghandler
 OBJDIR = ./Linux
 FILES = $(foreach dir, $(DIRS), $(wildcard $(dir)/*.cpp))
 OBJS = $(patsubst %.cpp, %.o ,$(FILES))

@@ -26,7 +26,8 @@ public:
 	~SocketWrapper();
 	void setRead(bool enable = false);
 	void setWrite(bool enable = false);
-
+	void setDelFlag(bool b = true);
+	bool isDelFlag(void);
 	bool isSetRead(void);
 	bool isSetWrite(void);
 	//读函数
@@ -43,13 +44,18 @@ public:
 	SocketIndex * getSocketIndex();
 
 	int getTotalRead();
+	ModelManager * getModelManager(){
+		return m_pModelManager;
+	}
 
+	
 private:
 	SocketWrapper():m_bWrite(false), m_bRead(false),m_nSocketFd(0),m_bufferRead(0),m_bufferWrite(0),m_pModelManager(NULL){}
 	
 	
 
 private:
+	bool m_bDelFlag;
 	bool m_bRead;
 	bool m_bWrite;
 	sockfd m_nSocketFd;

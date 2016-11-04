@@ -45,7 +45,9 @@ public:
 	void insertActiveList(sockfd fd, short eventtype);
 	void dispatch(int MilliSec);
 	SocketIndex * getSocketIndex(sockfd fd);
+	
 private:
+	void closeTcpConnection(sockfd fd);
 	std::map<sockfd , SocketWrapper *> m_mapSocketWrappers;
 	ModelOp * m_pModelOp;
 	void * m_pModelData;

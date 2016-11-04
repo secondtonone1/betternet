@@ -18,7 +18,10 @@
 
 #include<iostream>
 #include "../netmodel/modelmanager.h"
+#include "../msghandler/msghandler.h"
 using namespace std;
+
+std::map<sockfd, MsgHandler*> m_msgHandlerMap;
 
 
 static void tcpReadCB(ModelManager * managerPoint,  SocketWrapper * wrapper, sockfd fd, void * ctx)
@@ -28,12 +31,18 @@ static void tcpReadCB(ModelManager * managerPoint,  SocketWrapper * wrapper, soc
 	cout <<"msg size is: "<< sizeof(msg) <<endl;
 	wrapper->writeToBuffer(msg, sizeof(msg));*/
 	
-	int totallen = wrapper->getTotalRead();
-	char * msg = (char *)malloc(sizeof(char) * totallen);
-	memset(msg, 0, totallen);
-	wrapper->readFromBuffer(msg, totallen);
-	wrapper->writeToBuffer(msg, totallen);
-	free(msg);
+	std::map<sockfd, MsgHandler*>::iterator findIter = m_msgHandlerMap.find(fd);
+	if(findIter != m_msgHandlerMap.end())
+	{
+		bool result = findIter->second->unserilizeMsg();
+		if(!result)
+		{
+			wrapper->setDelFlag(true);
+			delete(findIter->second);
+			findIter->second = NULL;
+			m_msgHandlerMap.erase(fd);
+		}
+	}
 }
 	
 static void tcpWriteCB(ModelManager * managerPoint,  SocketWrapper * wrapper, sockfd fd, void * ctx)
@@ -43,6 +52,13 @@ static void tcpWriteCB(ModelManager * managerPoint,  SocketWrapper * wrapper, so
 	
 static void tcpErrorCB(ModelManager * managerPoint,  SocketWrapper * wrapper, sockfd fd, void * ctx)
 {
+	std::map<sockfd, MsgHandler*>::iterator findIter = m_msgHandlerMap.find(fd);
+	if(findIter != m_msgHandlerMap.end())
+	{
+		delete(findIter->second);
+		findIter->second = NULL;
+		m_msgHandlerMap.erase(fd);
+	}
 	cout << "error　！！！" << endl;
 }
 
@@ -65,6 +81,9 @@ void listenerReadCb(ModelManager * managerPoint,  SocketWrapper * wrapper, sockf
 	tcpWrapper->registercb(tcpReadCB, tcpWriteCB, tcpErrorCB);
 	managerPoint->enableRead(acceptres);
 	cout << "new connection arrived: "<< inet_ntoa(serveraddr.sin_addr) << endl;
+	MsgHandler * msgHandler = new MsgHandler(); 
+	msgHandler->setSocketWrapper(tcpWrapper);
+	m_msgHandlerMap.insert(std::pair<sockfd, MsgHandler *>(acceptres,msgHandler));
  	
 }
 

@@ -19,7 +19,7 @@ static void defaultErrorCB(ModelManager * managerPoint,  SocketWrapper * wrapper
 }
 
 SocketWrapper::SocketWrapper(sockfd fd, ModelManager * modelManager, bool isListen):m_bRead(false), m_bWrite(false), m_nSocketFd(fd),m_bufferRead(fd),m_bufferWrite(fd),
-		m_pModelManager(modelManager),m_bIsListen(isListen)
+		m_pModelManager(modelManager),m_bIsListen(isListen), m_bDelFlag(false)
 	{
 		make_socket_nonblocking(fd);
 		
@@ -39,6 +39,7 @@ SocketWrapper::	~SocketWrapper(){m_bRead = false; m_bWrite = false;
 		free(m_pSocketIndex);
 		m_pSocketIndex = NULL;
 	}
+	m_nSocketFd = 0;
 }
 
 
@@ -50,6 +51,16 @@ void SocketWrapper::setRead(bool enable )
 void SocketWrapper::setWrite(bool enable )
 {
 	m_bWrite = enable;
+}
+
+void SocketWrapper::setDelFlag(bool b )
+{
+	m_bDelFlag = b;
+}
+
+bool SocketWrapper::isDelFlag(void)
+{
+	return m_bDelFlag;
 }
 
 bool SocketWrapper::isSetRead(void)
@@ -73,6 +84,11 @@ int SocketWrapper::ToRead()
 
 	while(1)
 	{
+		if(m_bDelFlag)
+		{
+			return -1;
+		}
+
 		readtimes++;
 		cout << "readtimes is: "<< readtimes <<endl;
 		cout << "begin read!!!" <<endl;
@@ -100,8 +116,7 @@ int SocketWrapper::ToRead()
 		{
 			//将节点插入链表中
 			m_bufferRead.insertNodeTail(node);
-			cout <<"read size :"<<INITIALSIZE <<endl;
-			cout << "receive data is: "<<(char * )node + sizeof(Node) <<endl;
+		
 			//继续读取数据
 			continue;
 		}
@@ -109,8 +124,7 @@ int SocketWrapper::ToRead()
 		{
 			//将节点插入链表中
 			m_bufferRead.insertNodeTail(node);
-			cout <<"read size :"<<recvRes <<endl;
-			cout << "receive data is: "<<(char * )node + sizeof(Node) <<endl;
+	
 			//触发正确回调函数
 			(*m_pReadCBFunc)(m_pModelManager, this,  m_nSocketFd, NULL);
 			continue;
@@ -124,6 +138,11 @@ int SocketWrapper::ToWrite()
 {
 	while(1)
 	{
+		if(m_bDelFlag)
+		{
+			return -1;
+		}
+
 		Node * node = m_bufferWrite.getSendNode();
 		
 		if(!node)

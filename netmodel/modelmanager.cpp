@@ -264,6 +264,13 @@ void ModelManager::insertActiveList(sockfd fd, short eventtype)
 	}
 }
 
+void ModelManager::closeTcpConnection(sockfd fd)
+{
+	disableRead(fd);
+	disableWrite(fd);
+	delFdFromManager(fd);
+}
+
 void ModelManager::dispatch(int MilliSec)
 {
 	struct timeval tv;
@@ -283,11 +290,9 @@ void ModelManager::dispatch(int MilliSec)
 			continue;
 		}
 
-		if(findIter->second->ToRead() == -1)
+		if(findIter->second->ToRead() == -1 || findIter->second->isDelFlag())
 		{
-			disableRead(findIter->first);
-			disableWrite(findIter->first);
-			delFdFromManager(findIter->first);
+			closeTcpConnection(findIter->first);
 		}
 
 	}
@@ -301,11 +306,9 @@ void ModelManager::dispatch(int MilliSec)
 			continue;
 		}
 
-		if(findIter->second->ToWrite() == -1)
+		if(findIter->second->ToWrite() == -1 || findIter->second->isDelFlag())
 		{
-			disableRead(findIter->first);
-			disableWrite(findIter->first);
-			delFdFromManager(findIter->first);
+			closeTcpConnection(findIter->first);
 		}
 
 	}

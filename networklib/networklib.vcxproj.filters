@@ -57,6 +57,9 @@
     <ClInclude Include="..\netmodel\condition.h">
       <Filter>源文件\netmodel</Filter>
     </ClInclude>
+    <ClInclude Include="..\msghandler\msghandler.h">
+      <Filter>源文件</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -97,6 +100,9 @@
     </ClCompile>
     <ClCompile Include="..\netmodel\condition.cpp">
       <Filter>源文件\netmodel</Filter>
+    </ClCompile>
+    <ClCompile Include="..\msghandler\msghandler.cpp">
+      <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

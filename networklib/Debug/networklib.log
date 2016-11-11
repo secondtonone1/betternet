@@ -1,4 +1,4 @@
-﻿生成启动时间为 2016/11/4 17:56:21。
+﻿生成启动时间为 2016/11/11 17:27:36。
      1>项目“D:\win32projects\betternet\networklib\networklib.vcxproj”在节点 2 上(Build 个目标)。
      1>ClCompile:
          F:\Program Files (x86)\VC\bin\CL.exe /c /ZI /nologo /W3 /WX- /sdl /Od /Oy- /D WIN32 /D _DEBUG /D _CONSOLE /D _UNICODE /D UNICODE /Gm /EHsc /RTC1 /MDd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Fo"Debug\\" /Fd"Debug\vc110.pdb" /Gd /TP /analyze- /errorReport:prompt networklib.cpp
@@ -18,10 +18,9 @@
          Debug\writebuffer.obj
          Debug\networklib.obj
          Debug\stdafx.obj
-         LINK : 没有找到 D:\win32projects\betternet\Debug\networklib.exe 或上一个增量链接没有生成它；正在执行完全链接
          networklib.vcxproj -> D:\win32projects\betternet\Debug\networklib.exe
      1>已完成生成项目“D:\win32projects\betternet\networklib\networklib.vcxproj”(Build 个目标)的操作。
 
 生成成功。
 
-已用时间 00:00:01.59
+已用时间 00:00:01.14

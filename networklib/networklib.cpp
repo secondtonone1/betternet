@@ -68,23 +68,67 @@ void listenerReadCb(ModelManager * managerPoint,  SocketWrapper * wrapper, sockf
 	sockaddr_in serveraddr;
 	memset(&serveraddr, 0, sizeof(sockaddr_in));
 	size_t addrlen = sizeof(sockaddr_in);
-	sockfd acceptres = accept(fd, (sockaddr *)&serveraddr, (socklen_t *)&addrlen);
-	if(acceptres == -1)
+	
+	while(1)
 	{
-		cout << "accept failed !" <<endl;
-		int Error = getErrno();
-		cout << "errorno is : "<< Error <<endl;
-		return ;
+		memset(&serveraddr, 0, sizeof(sockaddr_in));
+		sockfd acceptres = accept(fd, (sockaddr *)&serveraddr, (socklen_t *)&addrlen);
+		if(acceptres == -1)
+		{
+			  int Error = getErrno();
+				#ifdef _WIN32
+				if(Error == WSAEWOULDBLOCK)
+				{
+					cout << "total connection has accepted !!" <<endl;
+						return ;
+				}
+
+				if(Error == WSAECONNRESET)
+				{
+					cout << "the other end has closed, errno msg is connreset!!! "<<endl;
+						return ;
+				}
+
+				cout << "socket accept failed!!!, errno is: %d"<<Error << endl;
+				return ;
+			#endif
+
+			#ifdef __linux__
+				if( (Error == EWOULDBLOCK) || (Error == EAGAIN))
+				{
+					cout << "total connection has accepted !!" <<endl;
+					return ;
+				}
+
+				if(Error == ECONNRESET)
+				{
+					cout << "the other end has closed, errno msg is connreset!!! "<<endl;
+						return ;
+				}
+
+				cout << "socket accept failed!!!, errno is: %d"<<Error << endl;
+				return ;
+			#endif
+
+
+			
+		
+			return ;
+		}
+	
+		SocketWrapper * tcpWrapper = managerPoint->addFdToManager(acceptres);
+		tcpWrapper->registercb(tcpReadCB, tcpWriteCB, tcpErrorCB);
+		managerPoint->enableRead(acceptres);
+	
+		cout << "new connection arrived: "<< inet_ntoa(serveraddr.sin_addr) << endl;
+		cout << "connection port: "<< ntohs(serveraddr.sin_port)<<std::endl;
+
+		MsgHandler * msgHandler = new MsgHandler(); 
+		msgHandler->setSocketWrapper(tcpWrapper);
+		m_msgHandlerMap.insert(std::pair<sockfd, MsgHandler *>(acceptres,msgHandler));
+ 	
 	}
 	
-	SocketWrapper * tcpWrapper = managerPoint->addFdToManager(acceptres);
-	tcpWrapper->registercb(tcpReadCB, tcpWriteCB, tcpErrorCB);
-	managerPoint->enableRead(acceptres);
-	cout << "new connection arrived: "<< inet_ntoa(serveraddr.sin_addr) << endl;
-	MsgHandler * msgHandler = new MsgHandler(); 
-	msgHandler->setSocketWrapper(tcpWrapper);
-	m_msgHandlerMap.insert(std::pair<sockfd, MsgHandler *>(acceptres,msgHandler));
- 	
 }
 
 

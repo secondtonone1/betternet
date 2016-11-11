@@ -89,8 +89,7 @@ int SocketWrapper::ToRead()
 			return -1;
 		}
 
-		readtimes++;
-		cout << "readtimes is: "<< readtimes <<endl;
+		
 		cout << "begin read!!!" <<endl;
 		Node * node = m_bufferRead.mallocNode();
 		int recvRes = m_bufferRead.receive(node);
@@ -124,10 +123,16 @@ int SocketWrapper::ToRead()
 		{
 			//将节点插入链表中
 			m_bufferRead.insertNodeTail(node);
-	
-			//触发正确回调函数
+
+			/////////////////////////////////原来版本
+			//触发正确回调函数 
+			//(*m_pReadCBFunc)(m_pModelManager, this,  m_nSocketFd, NULL);
+			//continue;
+			///////////////////////////////////////////
+
+			//改进后
 			(*m_pReadCBFunc)(m_pModelManager, this,  m_nSocketFd, NULL);
-			continue;
+			break;
 		}
 	}
 	
@@ -181,17 +186,28 @@ int SocketWrapper::ToWrite()
 
 		if(sendRes < remain)
 		{
+			//////////////////////////原来版本
 			//发送返回值小于期望发送的数值，那么监听写事件
-			m_pModelManager->enableWrite(m_nSocketFd);
+			/*m_pModelManager->enableWrite(m_nSocketFd);
 			cout << "possible ?"<<endl;
+			continue;*/
+			///////////////////////////////////////////
+
+			///////////////////////////现在版本
+			//发送返回值小于期望发送的数值
+			//有可能是别的原因造成发送数据较少，不一定是tcp发送缓存满了
+			//再发送一次
 			continue;
+			
 		}
 		else
 		{
+			
 			//触发正确回调函数
 			m_bufferWrite.clearSendNode();
 			(*m_pWriteCBFunc)(m_pModelManager, this,  m_nSocketFd, NULL);
 			continue;
+				
 		}
 	}
 

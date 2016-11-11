@@ -10,15 +10,16 @@
 #include <netinet/in.h>
 #include <stdio.h>
 #include <arpa/inet.h>
+#include <fcntl.h>
 #endif
 
 #include<iostream>
 #include "../netmodel/modelmanager.h"
-#include "../networklib/msghandler.h"
+#include "../msghandler/msghandler.h"
 using namespace std;
-
+int count = 0;
 std::map<sockfd, MsgHandler*> m_msgHandlerMap;
-
+int idlefd = 0;
 
 static void tcpReadCB(ModelManager * managerPoint,  SocketWrapper * wrapper, sockfd fd, void * ctx)
 {
@@ -62,17 +63,94 @@ void listenerReadCb(ModelManager * managerPoint,  SocketWrapper * wrapper, sockf
 {
 	cout << "begin accept!!!"<<endl;
 	sockaddr_in serveraddr;
-	memset(&serveraddr, 0, sizeof(sockaddr_in));
-	size_t addrlen = sizeof(sockaddr_in);
-	sockfd acceptres = accept(fd, (sockaddr *)&serveraddr, (socklen_t *)&addrlen);
-	if(acceptres == -1)
-	{
-		cout << "accept failed !" <<endl;
-		int Error = getErrno();
-		cout << "errorno is : "<< Error <<endl;
-		return ;
-	}
 	
+	size_t addrlen = sizeof(sockaddr_in);
+	
+	while(1)
+	{
+		memset(&serveraddr, 0, sizeof(sockaddr_in));
+		sockfd acceptres = accept(fd, (sockaddr *)&serveraddr, (socklen_t *)&addrlen);
+		if(acceptres == -1)
+		{
+			  int Error = getErrno();
+				#ifdef _WIN32
+				if(Error == WSAEWOULDBLOCK)
+				{
+					cout << "total connection has accepted !!" <<endl;
+						return ;
+				}
+
+				if(Error == WSAECONNRESET)
+				{
+					cout << "the other end has closed, errno msg is connreset!!! "<<endl;
+						return ;
+				}
+
+				cout << "socket accept failed!!!, errno is: %d"<<Error << endl;
+				return ;
+			#endif
+
+			#ifdef __linux__
+				if( (Error == EWOULDBLOCK) || (Error == EAGAIN))
+				{
+					cout << "total connection has accepted !!" <<endl;
+					return ;
+				}
+
+				if(Error == ECONNRESET)
+				{
+					cout << "the other end has closed, errno msg is connreset!!! "<<endl;
+						return ;
+				}
+				
+				if(Error == EMFILE)
+
+				    {
+                                            
+					cout << "too many files "<<endl;
+					close(idlefd);
+                                        idlefd = accept(fd, NULL, NULL);
+					count++;
+					cout << "after close" <<endl;
+					cout << idlefd <<endl;
+					while(idlefd > 0)
+					{
+						close(idlefd);
+						idlefd = accept(fd, NULL, NULL);
+						cout << "new accept"<<endl;
+						cout << idlefd <<endl;
+						count ++;
+					}
+
+					
+					if(idlefd == -1)
+					{
+						Error = getErrno();
+						cout << Error <<endl;
+						if(Error == EWOULDBLOCK||Error == EAGAIN )
+						{
+							cout << "after clear more files, total files accept"<<endl;
+						}
+					}
+					close(idlefd);
+					
+                                        
+                                       idlefd = open("/dev/null", O_RDONLY | O_CLOEXEC);
+					cout << "new connections count:" << count <<endl;
+					return;
+                                        
+                                    }
+
+
+				cout << "socket accept failed!!!, errno is: %d"<<Error << endl;
+				return ;
+			#endif
+
+		}
+	
+	
+	count ++;
+	cout << "new connections count : " << count <<endl;
 	SocketWrapper * tcpWrapper = managerPoint->addFdToManager(acceptres);
 	tcpWrapper->registercb(tcpReadCB, tcpWriteCB, tcpErrorCB);
 	managerPoint->enableRead(acceptres);
@@ -81,6 +159,7 @@ void listenerReadCb(ModelManager * managerPoint,  SocketWrapper * wrapper, sockf
 	msgHandler->setSocketWrapper(tcpWrapper);
 	m_msgHandlerMap.insert(std::pair<sockfd, MsgHandler *>(acceptres,msgHandler));
  	
+	}
 }
 
 
@@ -117,6 +196,10 @@ int main(int argc, char* argv[])
 	}
 
 	listen(m_nListenfd, 128);
+	 //¿¿¿¿¿¿¿¿¿
+         idlefd = open("/dev/null",O_RDONLY|O_CLOEXEC);
+
+
 	ModelManager * manager = new ModelManager();
 	SocketWrapper * listenerWrapper = manager->addFdToManager(m_nListenfd,true);
 	listenerWrapper->registercb(listenerReadCb, NULL, NULL);

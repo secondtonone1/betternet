@@ -45,6 +45,12 @@ public :
 		m_bIsPending = false;
 	}
 	bool unserilizeMsg();
+	bool unserilizeMsgNew();
+
+	bool dealPacketHead(HeadPacket * pHeadPacket);
+
+	//新增函数，尽可能多的读取数据进入MsgNode
+	bool readToMax(int remain);
 private:
 	SocketWrapper * m_pSocketWrapper;
 	MsgNode m_msgNode;

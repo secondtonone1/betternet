@@ -104,7 +104,7 @@
 
 		int offset  = 0;
 		
-		Node * node = popFirstNode();
+		Node * node = popFirstNode ();
 		if(!node)
 		{
 			return 0;
@@ -132,7 +132,6 @@
 			deallocNode(node);
 
 		}
-
 		m_nTotal -= offset;
 		return offset;
 	}

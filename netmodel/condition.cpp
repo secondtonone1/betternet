@@ -1,4 +1,4 @@
-#if defined(WIN32)
+﻿#if defined(WIN32)
 # include <windows.h>
 #else
 # include <pthread.h>
@@ -178,29 +178,31 @@ Condition::wait(Mutex& mutex, unsigned int ms)
         return true;
     }
 #else
+	//1
     enterWait();
 
     mutex.unlock();
 
     bool ret = false;
     unsigned int res = 0;
-
+	//2
     res = WaitForSingleObject(reinterpret_cast<HANDLE>(mQueue),ms);
     assert(res != WAIT_FAILED && res != WAIT_ABANDONED);
     ret = (res == WAIT_OBJECT_0);
 
     unsigned wasWaiting = 0;
     unsigned wasGone = 0;
-
+	//3
     res = WaitForSingleObject(reinterpret_cast<HANDLE>(mMutex), INFINITE);
     assert(res == WAIT_OBJECT_0);
     wasWaiting = mWaiting;
     wasGone = mGone;
     if (wasWaiting != 0)
     {
+		//超时返回的情况下，刚好有一个信号释放出来(2,3之间)
         if (!ret) 
         {
-            if (mBlocked != 0)
+            if (mBlocked != 0)//存在阻塞的信号，由于wait超时或者虚假唤醒导致，那么减少阻塞量
                 --mBlocked;
             else
                 ++mGone; 
@@ -213,11 +215,11 @@ Condition::wait(Mutex& mutex, unsigned int ms)
                 assert(res);
                 wasWaiting = 0;
             }
-            else if (mGone != 0)
+            else if (mGone != 0)  //没有可用变量，并且没有阻塞变量，那么可以将错过的事件清空，第4步作处理
                 mGone = 0;
         }
     }
-    else if (++mGone == (ULONG_MAX / 2))
+    else if (++mGone == (ULONG_MAX / 2))  //虚假唤醒或因为超时走入该逻辑
     {
         res = WaitForSingleObject(reinterpret_cast<HANDLE>(mGate), INFINITE);
         assert(res == WAIT_OBJECT_0);
@@ -229,6 +231,8 @@ Condition::wait(Mutex& mutex, unsigned int ms)
     res = ReleaseMutex(reinterpret_cast<HANDLE>(mMutex));
     assert(res);
 
+	//4
+	//因超时跳出wait的mQueue需要将条件变量永久检测等待(2步超时继续下面逻辑，此时signal返回更改waiting，block等变量，然后走入3步)
     if (wasWaiting == 1)
     {
         for (; wasGone; --wasGone)
